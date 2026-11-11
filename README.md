@@ -1,4 +1,4 @@
-# game-template（Godot 4.4）
+# game-template（Godot 4.4+）
 
 可以直接克隆开工的 Godot 骨架。**架构已搭好、基础设施已接好、玩法留空。**
 
@@ -15,7 +15,10 @@ cd my-game
 git submodule update --init --recursive
 ```
 
-用 Godot 4.4 打开，确认 **项目设置 → 插件 → gd-common** 已启用，然后 F5 运行。
+用 **Godot 4.4 或更高版本** 打开（4.4 / 4.5 / 4.6 / 4.7 均已实测），
+确认 **项目设置 → 插件 → gd-common** 已启用，然后 F5 运行。
+`project.godot` 里的 `config/features` 是 `4.4`，那是项目格式下限，不是锁定 4.4；
+版本规则见 `agent.md` 的「版本基线」。
 
 控制台会打印：
 
@@ -150,7 +153,8 @@ godot --headless --path . --quit                 # 项目能起、无错误、�
 通过标准三条：0 个 `ERROR`、没有 `ObjectDB instances were leaked at exit`、
 结尾打印 `RESULT: all 8 suites passed`。
 
-已在 **Godot 4.7.stable** 上验证通过。Godot 不在 `PATH` 时用
+已在 **Godot 4.4 / 4.5 / 4.6 / 4.7 stable** 上全部实跑通过（每个版本都是
+项目启动 0 错误 + 8/8 套件通过）。Godot 不在 `PATH` 时用
 `GODOT=/path/to/godot ./addons/gd-common/tests/run_all.sh`。
 
 ---

@@ -8,7 +8,7 @@
 
 ## 1. 这个仓库是什么
 
-一个可以直接克隆开工的 Godot 4.4 骨架：架构已经搭好，基础设施已经接好，玩法留空。
+一个可以直接克隆开工的 Godot **4.4+** 骨架：架构已经搭好，基础设施已经接好，玩法留空。
 
 ```bash
 git clone https://github.com/godot-projects-of-hexin/game-template.git my-game
@@ -194,8 +194,36 @@ godot --headless --path . --quit                      # 项目能起、无错误
 
 > Godot 不在 `PATH` 时：`GODOT=/path/to/godot ./addons/gd-common/tests/run_all.sh`
 
-本项目已在 **Godot 4.7.stable** 上验证通过。`project.godot` 里声明的
-`config/features` 是 `4.4`，那是项目格式的下限，不是必须用 4.4 打开。
+### 版本基线
+
+**支持 Godot 4.4 及更高版本；不是只能用 4.4。**
+
+`project.godot` 里的 `config/features=PackedStringArray("4.4")` 是**项目格式下限**，
+不是「必须用 4.4 打开」。已实测 4.5 / 4.6 / 4.7 打开都不会改写这一行。
+代码里最老的语法门槛是 `static var`（4.1 引入），没有使用任何 4.5+ 才有的 API。
+
+| 引擎版本 | 实测结果 |
+|---|---|
+| 4.4.stable | ✅ 启动 0 错误，8/8 套件通过 |
+| 4.5.stable | ✅ 启动 0 错误，8/8 套件通过 |
+| 4.6.stable | ✅ 启动 0 错误，8/8 套件通过 |
+| 4.7.stable | ✅ 启动 0 错误 0 泄漏，8/8 套件通过 |
+| 4.3 及以下 | ❌ 不支持：`features` 声明 4.4，且 `.gd.uid` 是 4.4 才引入 |
+| 4.8+ | 未验证；`features=4.4` 本身不会阻止打开 |
+
+项目层两条硬规则：
+
+1. **不要手动升级 `config/features`。** 一旦被改成 `4.7`，4.4 就打不开了。
+   高版本编辑器若提示「升级项目格式」，选否，或提交前还原这一行。
+2. **团队尽量统一小版本。** 混用版本时 `icon.svg.import` 会来回变脏：
+   4.7 会多写 `compress/uastc_level`、`process/channel_remap/*` 等默认参数，
+   4.4 打开又会删掉。只涉及这一个 `.import` 文件、没有别的改动时，直接还原。
+
+首次 `--import` 打印的 4 行 `gd-common: autoload '...' already exists` 警告，
+是插件保留项目自定义 autoload 的正常行为，不是错误。
+
+共享库自身的版本约束与代码门槛见
+[`addons/gd-common/agent.md`](addons/gd-common/agent.md) 第 7.0 节。
 
 ### 更新共享库
 
