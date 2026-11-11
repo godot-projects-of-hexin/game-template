@@ -104,6 +104,17 @@ GameArchitecture.get_instance()
 唯一例外是 `core/game_flow.gd`：它覆写 `_resolve_architecture()` 来钉住架构的创建时机。
 autoload 先于主场景加载，所以等主场景的控制器解析默认架构时，它已经就绪。
 
+`GameFlow` 还负责**退出时释放架构**：
+
+```gdscript
+func _exit_tree() -> void:
+	_machine = null
+	GameArchitecture.reset_instance()
+```
+
+`GameArchitecture._instance` 是 `static var`，不会随场景树消失。少了这段，
+引擎退出检查会报 `ObjectDB instances were leaked at exit`。
+
 ### 4.2 autoload 只允许这五个
 
 ```text
@@ -162,13 +173,29 @@ const SFX := {
 ### 提交前必须跑
 
 ```bash
-godot --headless --path . --quit                      # 项目能起、无解析错误
+godot --headless --path . --import                    # 全新 clone 必须先跑这步
+godot --headless --path . --quit                      # 项目能起、无错误、无泄漏
 ./addons/gd-common/tests/run_all.sh                   # 共享库全部测试
 ```
 
-通过标准：输出里 **0 个 `ERROR`**，每个测试套件打印 `all passed`。
+第一步不能省：全新 clone 没有 `.godot/` 全局类缓存，直接跑第二步会报
+`Could not find base class "GxControllerNode"`。
+
+通过标准三条：
+
+| 检查项 | 通过标准 |
+|---|---|
+| 解析与运行 | `--quit` 这一步 0 个 `ERROR`、0 个 `SCRIPT ERROR` |
+| 内存 | `--quit` 这一步没有 `ObjectDB instances were leaked at exit` |
+| 测试 | `RESULT: all 8 suites passed` |
+
+测试输出里的 `ERROR:` 行和 `test_audio_manager` 的泄漏警告是已知且正常的，
+原因见 `addons/gd-common/agent.md` 第 7.1 节。
 
 > Godot 不在 `PATH` 时：`GODOT=/path/to/godot ./addons/gd-common/tests/run_all.sh`
+
+本项目已在 **Godot 4.7.stable** 上验证通过。`project.godot` 里声明的
+`config/features` 是 `4.4`，那是项目格式的下限，不是必须用 4.4 打开。
 
 ### 更新共享库
 

@@ -139,13 +139,19 @@ assets/                     美术、音频、字体
 ## 验证
 
 ```bash
-godot --headless --path . --quit                 # 项目能起、无解析错误
+godot --headless --path . --import               # 全新 clone 必须先跑这步
+godot --headless --path . --quit                 # 项目能起、无错误、无泄漏
 ./addons/gd-common/tests/run_all.sh              # 共享库全部测试
 ```
 
-通过标准：输出里 0 个 `ERROR`，每个套件打印 `all passed`。
+第一步不能省：全新 clone 没有 `.godot/` 全局类缓存，直接跑第二步会报
+`Could not find base class "GxControllerNode"`。
 
-Godot 不在 `PATH` 时：`GODOT=/path/to/godot ./addons/gd-common/tests/run_all.sh`
+通过标准三条：0 个 `ERROR`、没有 `ObjectDB instances were leaked at exit`、
+结尾打印 `RESULT: all 8 suites passed`。
+
+已在 **Godot 4.7.stable** 上验证通过。Godot 不在 `PATH` 时用
+`GODOT=/path/to/godot ./addons/gd-common/tests/run_all.sh`。
 
 ---
 

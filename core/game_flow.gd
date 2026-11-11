@@ -36,6 +36,14 @@ func _on_controller_ready() -> void:
 	send_command(LoadGameCommand.new())
 
 
+func _exit_tree() -> void:
+	# 游戏退出时必须释放静态单例持有的架构，否则引擎在退出检查里会报
+	# 「ObjectDB instances were leaked」。GameArchitecture._instance 是
+	# static var，不会随场景树一起消失。
+	_machine = null
+	GameArchitecture.reset_instance()
+
+
 ## 切换到某个阶段。目标等于当前阶段时状态机会告警并忽略。
 func go(phase: StringName) -> void:
 	if _machine == null:
