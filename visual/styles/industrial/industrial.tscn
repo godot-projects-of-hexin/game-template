@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="../../core/post_process.tscn" id="1"]
+[ext_resource type="Resource" path="presets/balanced.tres" id="2"]
+
+[node name="IndustrialPostProcess" instance=ExtResource("1")]
+profile = ExtResource("2")

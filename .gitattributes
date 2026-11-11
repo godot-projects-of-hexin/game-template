@@ -12,6 +12,7 @@
 *.import  text eol=lf
 
 *.png     binary
+*.res     binary
 *.jpg     binary
 *.jpeg    binary
 *.webp    binary

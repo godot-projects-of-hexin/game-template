@@ -69,6 +69,7 @@
 | 改存档字段 | `core/models/` + `SaveUtility._migrate()` | key 是契约，version 加一 | 项目层：旧档能读、默认值生效 |
 | 加音效 / BGM | `core/utilities/` 新建映射（骨架未内置） | `AudioManager` 收 `AudioStream`，见 `agent.md` 4.5 | 手动听 |
 | 加 UI 面板 / 层级 | `scenes/ui/` | `UIManager.push_panel()` / `set_layer()` | 共享库 `test_ui_manager` |
+| 加画面风格 / 后处理 | `visual/`（管线 `core/` + 风格 `styles/`） | 换 `style_profile.gd` 的 Profile 资源，组件不写死风格 | 项目层 `test_visual_style` |
 | 加流程阶段、换场景、改解锁阈值 | `core/game_flow.gd` | `PHASE_SCENES` `PLAY_UNLOCK_SCORE` `should_enter_play()` | 项目层：纯函数 + 读档判定 |
 | 跨 autoload 打招呼（过场、调试开关） | `EventBus` | `StringName` 键 | — |
 | 包文件、网络、平台 SDK | `core/utilities/` | `GxUtility`，只做自己的事 | 项目层：Fake 替身 |
@@ -160,6 +161,7 @@
 | `agent.md` | 项目层约定：目录放置、标准动作、4.1–4.8 专属条款、提交纪律 | 写代码前 |
 | `addons/gd-common/agent.md` | 通用规则：Godot 官方规范、分层权限表 3.2、命名、通信方式、三次法则、测试与版本基线 | 写共享库或查权限时 |
 | `README.md` | 怎么跑起来、目录树、「加一个新功能」7 步示例、验证命令 | 首次 clone / 找示例时 |
+| `visual/README.md` | 画面风格模块用法、两种接法、新增风格步骤、演示与预览 | 加/换画面风格时 |
 | `addons/gd-common/README.md` | 共享库对外 API 清单（含 `GxWriteGuard`） | 查共享库接口时 |
 
 改规则时：改权威正文 + 更新本文索引 + 补断言 + 跑门禁。

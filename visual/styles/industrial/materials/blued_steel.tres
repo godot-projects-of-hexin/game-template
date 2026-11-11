@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://visual/styles/industrial/materials/textures/blued_steel_albedo.res" id="1_d1gji"]
+[ext_resource type="Texture2D" path="res://visual/styles/industrial/materials/textures/blued_steel_roughness.res" id="2_pev1c"]
+
+[resource]
+resource_name = "blued_steel"
+albedo_texture = ExtResource("1_d1gji")
+metallic = 0.72
+roughness_texture = ExtResource("2_pev1c")

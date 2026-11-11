@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=4 format=3]
+
+[ext_resource type="Script" path="../../../core/style_profile.gd" id="1"]
+[ext_resource type="Shader" path="../shaders/retro_fast.gdshader" id="2"]
+[ext_resource type="Shader" path="../shaders/retro_chromatic.gdshader" id="3"]
+
+[resource]
+resource_name = "Industrial / Balanced"
+script = ExtResource("1")
+shader = ExtResource("2")
+chromatic_shader = ExtResource("3")

@@ -2,14 +2,15 @@
 # Run the project-layer regression suites from the project root.
 #
 # Usage:
-#   ./tests/run_all.sh
-#   GODOT=/path/to/godot ./tests/run_all.sh
+#   bash tests/run_all.sh
+#   GODOT=/path/to/godot bash tests/run_all.sh
 set -u
 
 GODOT="${GODOT:-godot}"
 PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 SUITES=(
 	test_project_core
+	test_visual_style
 )
 
 if ! command -v "$GODOT" >/dev/null 2>&1; then

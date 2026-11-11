@@ -72,6 +72,7 @@ scenes/
 assets/                     美术、音频、字体
 tests/                      项目层回归测试 + run_all.sh
 scripts/verify.sh           提交前门禁（跑完三条通过标准）
+visual/                     可复用画面风格模块（通用管线 + 风格包）
 ```
 
 ---
@@ -176,14 +177,15 @@ $env:GODOT = 'D:\path\to\Godot_v4.7-stable_win64_console.exe'   # console 版才
 ```bash
 godot --headless --path . --import               # 全新 clone 必须先跑这步
 bash addons/gd-common/tests/run_all.sh           # 共享库 12 个套件
-bash tests/run_all.sh                            # 项目层 1 个套件
+bash tests/run_all.sh                            # 项目层 2 个套件
 ```
 
 第一步不能省：全新 clone 没有 `.godot/` 全局类缓存，否则报
 `Could not find base class "GxControllerNode"`。
 
 当前实现已在 **Godot 4.7 stable** 实跑通过：启动 0 错误 0 泄漏、
-13/13 套件，项目层 0 泄漏 0 告警，且无写守卫误报。
+14/14 套件，项目层 0 泄漏、无写守卫误报。`test_visual_style` 的查重用例会故意
+触发一条重复实例 warning，属预期输出。
 4.4 / 4.5 / 4.6 的矩阵复测尚未重跑。Linux / macOS 下 Godot 不在 `PATH` 时用
 `GODOT=/path/to/godot bash scripts/verify.sh`。
 
