@@ -1,3 +1,3 @@
 [submodule "addons/gd-common"]
 	path = addons/gd-common
-	url = https://github.com/monsterscoming/gd-common.git
+	url = https://github.com/godot-projects-of-hexin/gd-common.git
