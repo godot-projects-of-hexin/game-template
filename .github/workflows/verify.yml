@@ -1,0 +1,33 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Keep in sync with the version baseline in agent.md (section 6).
+      GODOT_VERSION: 4.7-stable
+    steps:
+      - name: Checkout (with gd-common submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Godot headless
+        run: |
+          curl -fsSL -o godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q godot.zip
+          GODOT_BIN="$(find . -maxdepth 1 -type f -name 'Godot_v*_linux*' -print -quit)"
+          test -n "$GODOT_BIN" || { echo "Godot binary not found in archive" >&2; exit 1; }
+          chmod +x "$GODOT_BIN"
+          echo "GODOT=$PWD/${GODOT_BIN#./}" >> "$GITHUB_ENV"
+
+      - name: Run gate
+        run: bash ./scripts/verify.sh

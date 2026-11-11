@@ -1,12 +1,7 @@
 class_name PlayerModel
 extends GxModel
-## Model 层：玩家状态的唯一来源。
-##
-## 这里只放「状态」和「读写状态的方法」。判断逻辑（够不够钱、该不该升级）
-## 属于 System 或 Query，不要写进来。
-##
-## 对外暴露的值用 GxBindableProperty，这样 UI 可以 bind 并立刻拿到当前值，
-## 不会出现「界面先显示 0，等下一次变化才对」的问题。
+## Model 层：只放状态与读写状态的方法；判断逻辑归 System / Query。
+## 用 GxBindableProperty 暴露值，UI 可以 bind 并立刻拿到当前值。
 
 const SAVE_SLOT := 0
 
@@ -36,7 +31,15 @@ func to_save_data() -> Dictionary:
 
 
 ## 从存档恢复。用 set_value_silent 避免逐字段触发一串 UI 刷新，
-## 恢复完成后由 GameLoadedEvent 统一通知表现层重建。
+## 恢复完成后由 GameLoadedEvent 统一通知表现层重建（见 notify_all）。
 func apply_save_data(data: Dictionary) -> void:
 	score.set_value_silent(int(data.get("score", 0)))
 	coins.set_value_silent(int(data.get("coins", 0)))
+
+
+## 读档后统一重播所有可绑定状态，让已经 bind 的表现层重建界面。
+## 只重播、不写入 —— 状态恢复完全由 apply_save_data() 负责，
+## 所以这不属于「表现层直接改状态」。
+func notify_all() -> void:
+	score.notify()
+	coins.notify()

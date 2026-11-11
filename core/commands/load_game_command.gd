@@ -1,9 +1,8 @@
 class_name LoadGameCommand
 extends GxCommand
-## 意图：读档。
-##
-## Model 恢复时用的是静默写入，所以这里结束后必须发 GameLoadedEvent，
-## 否则表现层不知道该重建界面。
+## 意图：读档。恢复用静默写入，结束时发 GameLoadedEvent 让表现层统一重建界面。
+## 刻意不发 ScoreChangedEvent —— 那会让 ScoreSystem 把刚读进来的档立刻写回去。
+## 契约见 agent.md 4.4。
 
 var _slot: int
 
@@ -22,4 +21,3 @@ func _on_execute() -> void:
 		return
 	player.apply_save_data(data)
 	send_event(GameLoadedEvent.create(_slot))
-	send_event(ScoreChangedEvent.create(int(player.score.get_value())))

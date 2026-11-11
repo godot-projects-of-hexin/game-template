@@ -1,7 +1,9 @@
 extends GxControllerNode
 ## Autoload: GameFlow —— 顶层流程控制器。
 ##
-## 它是表现层：持有流程状态机、负责换场景、读档。业务规则不写在这里。
+## 表现层控制器：持有流程状态机、负责换场景，启动时发 LoadGameCommand 读档。
+## 「分数怎么换算」这类业务规则不写在这里（那是 ScoreSystem）；
+## **阶段转换阈值与场景映射属于流程配置**，由架构事件驱动，不落到具体 UI 脚本里。
 ##
 ## 通过覆写 _resolve_architecture() 把架构的创建时机钉在这里。autoload 先于
 ## 主场景加载，所以等主场景里的控制器开始解析默认架构时，它已经就绪了。
@@ -14,6 +16,9 @@ const PHASE_SCENES := {
 	&"title": "res://scenes/main.tscn",
 	&"play": "res://scenes/levels/level_01.tscn",
 }
+
+## 达到该分数后从 title 进入 play。流程配置，不是业务规则。
+const PLAY_UNLOCK_SCORE := 100
 
 ## 阶段已经切换。表现层想跟随流程时监听这个，不要去读状态机内部。
 signal phase_changed(from_phase: StringName, to_phase: StringName)
@@ -32,8 +37,34 @@ func _on_controller_ready() -> void:
 	_machine.state_changed.connect(_on_phase_changed)
 	# start() 不触发 state_changed，所以不会在启动时又切一次场景。
 	_machine.start(PHASE_TITLE)
+	# 流程转换由架构事件驱动：加分与读档都走同一条判定，表现层不再持有规则。
+	register_event(ScoreChangedEvent, _on_score_changed)
+	register_event(GameLoadedEvent, _on_game_loaded)
 	# 槽位为空时该命令自己会静默返回，不需要先查一次。
 	send_command(LoadGameCommand.new())
+
+
+## 纯判定，与状态机/节点解耦，便于项目层测试直接锁死。
+static func should_enter_play(score: int, current: StringName) -> bool:
+	return score >= PLAY_UNLOCK_SCORE and current == PHASE_TITLE
+
+
+func _try_enter_play(score: int) -> void:
+	if should_enter_play(score, current_phase()):
+		go(PHASE_PLAY)
+
+
+func _on_score_changed(event: ScoreChangedEvent) -> void:
+	_try_enter_play(event.score)
+
+
+## 读档后按恢复出来的分数立即判定阶段，不必等下一次加分。
+## 用 GameLoadedEvent 而不是 ScoreChangedEvent —— 读档刻意不发后者，避免自动写回。
+func _on_game_loaded(_event: GameLoadedEvent) -> void:
+	var player := get_model(PlayerModel) as PlayerModel
+	if player == null:
+		return
+	_try_enter_play(int(player.score.get_value()))
 
 
 func _exit_tree() -> void:

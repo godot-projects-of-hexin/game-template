@@ -17,6 +17,7 @@ var _last_autosave_step := 0
 func _on_init() -> void:
 	register_event(ScoreChangedEvent, _on_score_changed)
 	register_event(GameResetEvent, _on_game_reset)
+	register_event(GameLoadedEvent, _on_game_loaded)
 
 
 ## 当前分数能换多少硬币。业务规则放 System，不放 Model。
@@ -34,8 +35,15 @@ func _on_score_changed(event: ScoreChangedEvent) -> void:
 	if player == null or save_utility == null:
 		return
 	save_utility.save(PlayerModel.SAVE_SLOT, player.to_save_data())
-	print("[ScoreSystem] autosaved at score %d" % event.score)
 
 
 func _on_game_reset(_event: GameResetEvent) -> void:
 	_last_autosave_step = 0
+
+
+## 读档后按恢复出来的分数重新起算步进，避免沿用上一局的计数。
+func _on_game_loaded(_event: GameLoadedEvent) -> void:
+	var player := get_model(PlayerModel) as PlayerModel
+	if player == null:
+		return
+	_last_autosave_step = int(player.score.get_value()) / AUTOSAVE_SCORE_STEP
